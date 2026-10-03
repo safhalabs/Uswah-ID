@@ -45,7 +45,7 @@ export default function NiatModal({ rule, onClose }: NiatModalProps) {
               <p className="text-xs uppercase font-semibold tracking-wider text-emerald-800 dark:text-emerald-300 mb-3">
                 Lafadz Niat Puasa
               </p>
-              <p className="text-2xl sm:text-3xl font-serif leading-loose text-slate-900 dark:text-emerald-50 direction-rtl">
+              <p dir="rtl" className="text-2xl sm:text-3xl font-arabic font-bold leading-loose text-slate-900 dark:text-emerald-50">
                 {rule.niatArabic}
               </p>
             </div>

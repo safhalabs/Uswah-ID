@@ -92,13 +92,13 @@ export default function Navbar({ currentCity, onOpenCitySelector }: NavbarProps)
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                     isActive
-                      ? "bg-emerald-100/90 text-emerald-900 dark:bg-emerald-900/60 dark:text-emerald-200 shadow-xs"
-                      : "text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/40"
+                      ? "bg-emerald-600 text-white dark:bg-emerald-500/20 dark:text-emerald-300 dark:border dark:border-emerald-400/30 shadow-xs"
+                      : "text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40"
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5 opacity-70" />
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-white dark:text-emerald-300" : "opacity-70"}`} />
                   <span>{link.label}</span>
                 </Link>
               );

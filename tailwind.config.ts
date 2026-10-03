@@ -35,8 +35,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        arabic: ["'Amiri'", "'Scheherazade New'", "serif"],
-        sans: ["var(--font-inter)", "sans-serif"],
+        arabic: ["var(--font-arabic)", "'Amiri'", "'Scheherazade New'", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
       },
     },
   },

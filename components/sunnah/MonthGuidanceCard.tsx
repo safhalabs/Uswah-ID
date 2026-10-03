@@ -74,7 +74,7 @@ export default function MonthGuidanceCard() {
               <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                 {activeMonth.latinName}
               </h3>
-              <span className="text-2xl font-serif text-emerald-300">
+              <span className="text-2xl font-arabic text-emerald-300 font-bold">
                 {activeMonth.arabicName}
               </span>
             </div>
@@ -116,7 +116,7 @@ export default function MonthGuidanceCard() {
                     }`}
                   >
                     <span>{m.monthIndex}. {m.latinName}</span>
-                    <span className="font-serif opacity-70">{m.arabicName}</span>
+                    <span className="font-arabic opacity-80 font-bold">{m.arabicName}</span>
                   </button>
                 ))}
               </div>

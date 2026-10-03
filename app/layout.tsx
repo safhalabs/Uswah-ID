@@ -1,5 +1,19 @@
 import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans, Amiri } from "next/font/google";
 import "./globals.css";
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const amiri = Amiri({
+  subsets: ["arabic"],
+  weight: ["400", "700"],
+  variable: "--font-arabic",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Uswah.id — Pengingat Sholat, Kalender Hijriah & Meneladani Sunnah",
@@ -35,10 +49,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang="id" className={`${jakarta.variable} ${amiri.variable}`} suppressHydrationWarning>
       <body className="islamic-bg-pattern font-sans antialiased">
         {children}
       </body>
     </html>
   );
 }
+

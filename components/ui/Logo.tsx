@@ -33,20 +33,20 @@ export default function Logo({
         >
           <defs>
             <linearGradient id="logoInnerGold" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#fef08a" />
-              <stop offset="50%" stop-color="#f59e0b" />
-              <stop offset="100%" stop-color="#d97706" />
+              <stop offset="0%" stopColor="#fef08a" />
+              <stop offset="50%" stopColor="#f59e0b" />
+              <stop offset="100%" stopColor="#d97706" />
             </linearGradient>
             <linearGradient id="logoInnerEmerald" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#34d399" />
-              <stop offset="100%" stop-color="#059669" />
+              <stop offset="0%" stopColor="#34d399" />
+              <stop offset="100%" stopColor="#059669" />
             </linearGradient>
           </defs>
 
           {/* Octagram Rub el Hizb subtle background */}
           <g transform="translate(50 50)" opacity="0.28">
-            <rect x="-24" y="-24" width="48" height="48" rx="4" stroke="#6ee7b7" stroke-width="1.2" />
-            <rect x="-24" y="-24" width="48" height="48" rx="4" stroke="#6ee7b7" stroke-width="1.2" transform="rotate(45)" />
+            <rect x="-24" y="-24" width="48" height="48" rx="4" stroke="#6ee7b7" strokeWidth="1.2" />
+            <rect x="-24" y="-24" width="48" height="48" rx="4" stroke="#6ee7b7" strokeWidth="1.2" transform="rotate(45)" />
           </g>
 
           {/* Mihrab / Dome contour */}

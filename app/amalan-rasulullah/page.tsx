@@ -82,7 +82,7 @@ export default function AmalanRasulullahPage() {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                     Bulan ke-{m.monthIndex}
                   </span>
-                  <span className="font-serif text-sm text-emerald-700 dark:text-emerald-400 font-bold">
+                  <span className="font-arabic text-base text-emerald-700 dark:text-emerald-400 font-bold">
                     {m.arabicName}
                   </span>
                 </div>
@@ -122,7 +122,7 @@ export default function AmalanRasulullahPage() {
                     <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400">
                       {String(m.monthIndex).padStart(2, "0")}. {m.latinName}
                     </span>
-                    <span className="text-sm font-serif text-slate-400 dark:text-slate-500">
+                    <span className="text-base font-arabic font-bold text-slate-400 dark:text-slate-500">
                       {m.arabicName}
                     </span>
                   </div>

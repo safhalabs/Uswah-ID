@@ -52,28 +52,28 @@ export default function HomePage() {
           </div>
 
           {/* Quick Access Card (Modern & Compact) */}
-          <div className="rounded-3xl bg-gradient-to-br from-emerald-900 via-[#073623] to-[#042417] text-white p-5 sm:p-6 shadow-xs border border-emerald-800/40 flex flex-col justify-between">
+          <div className="rounded-3xl bg-gradient-to-br from-[#064e3b] via-[#043325] to-[#021c15] text-white p-5 sm:p-6 shadow-sm border border-emerald-500/25 flex flex-col justify-between">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-800/80 text-emerald-200 text-[11px] font-semibold mb-3 border border-emerald-700/60">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-800/80 text-emerald-200 text-[11px] font-bold mb-3 border border-emerald-600/40">
                 <Sparkles className="w-3 h-3 text-amber-300" />
                 <span>Uswatun Hasanah</span>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug">
+              <h3 className="text-lg sm:text-xl font-extrabold mb-1.5 leading-snug tracking-tight text-white">
                 Meneladani Ibadah &amp; Akhlak Rasulullah
               </h3>
-              <p className="text-xs text-emerald-100/80 leading-relaxed">
+              <p className="text-xs text-emerald-100/75 leading-relaxed">
                 Setiap bulan dalam kalender Hijriah menyimpan jejak sejarah agung dan sunnah mulia yang dapat kita amalkan dalam kehidupan sehari-hari.
               </p>
             </div>
 
-            <div className="mt-5 space-y-2">
+            <div className="mt-5 space-y-2.5">
               <Link
                 href="/kalender-hijriah"
-                className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl bg-white/10 hover:bg-white/15 text-xs font-semibold transition-all group border border-white/5"
+                className="flex items-center justify-between p-3 rounded-2xl bg-white/8 hover:bg-white/15 text-xs font-bold transition-all group border border-white/10 hover:border-emerald-400/30 hover:scale-[1.01]"
               >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 group-hover:scale-105 transition-transform">
-                    <Calendar className="w-3.5 h-3.5 text-emerald-300" />
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-300 group-hover:scale-105 transition-transform">
+                    <Calendar className="w-4 h-4 text-emerald-300" />
                   </div>
                   <span>Kalender Hijriah &amp; Puasa</span>
                 </div>
@@ -82,11 +82,11 @@ export default function HomePage() {
 
               <Link
                 href="/jadwal-sholat"
-                className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl bg-white/10 hover:bg-white/15 text-xs font-semibold transition-all group border border-white/5"
+                className="flex items-center justify-between p-3 rounded-2xl bg-white/8 hover:bg-white/15 text-xs font-bold transition-all group border border-white/10 hover:border-emerald-400/30 hover:scale-[1.01]"
               >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 group-hover:scale-105 transition-transform">
-                    <Clock className="w-3.5 h-3.5 text-emerald-300" />
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-300 group-hover:scale-105 transition-transform">
+                    <Clock className="w-4 h-4 text-emerald-300" />
                   </div>
                   <span>Jadwal Sholat 1 Bulan Penuh</span>
                 </div>
@@ -95,11 +95,11 @@ export default function HomePage() {
 
               <Link
                 href="/amalan-rasulullah"
-                className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl bg-white/10 hover:bg-white/15 text-xs font-semibold transition-all group border border-white/5"
+                className="flex items-center justify-between p-3 rounded-2xl bg-white/8 hover:bg-white/15 text-xs font-bold transition-all group border border-white/10 hover:border-emerald-400/30 hover:scale-[1.01]"
               >
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 group-hover:scale-105 transition-transform">
-                    <Compass className="w-3.5 h-3.5 text-emerald-300" />
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-300 group-hover:scale-105 transition-transform">
+                    <Compass className="w-4 h-4 text-emerald-300" />
                   </div>
                   <span>Peta Amalan 12 Bulan Hijriah</span>
                 </div>
@@ -111,13 +111,13 @@ export default function HomePage() {
 
         {/* Section: Meneladani Rasulullah SAW di Bulan Ini */}
         <section>
-          <div className="mb-3.5">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <div className="mb-4">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2 tracking-tight">
               <Heart className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-600/20" />
               <span>Meneladani Rasulullah SAW Bulan Ini</span>
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Amalan sunnah berdalil hadits shahih &amp; napak tilas sirah nabawiyah
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Amalan sunnah berdalil hadits shahih &amp; napak tilas sirah nabawiyah sepanjang masa
             </p>
           </div>
           <MonthGuidanceCard />

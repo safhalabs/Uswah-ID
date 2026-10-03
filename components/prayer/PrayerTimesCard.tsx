@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, useRef } from "react";
 import {
   Clock,
   Volume2,
@@ -16,6 +16,8 @@ import {
   ChevronRight,
   ShieldCheck,
   CalendarDays,
+  BellRing,
+  CheckCircle2,
 } from "lucide-react";
 import { CityLocation } from "@/data/cities";
 import {
@@ -24,7 +26,7 @@ import {
   PrayerTimeItem,
 } from "@/lib/prayerCalculations";
 import { soundEngine } from "@/lib/audioAlert";
-import { getStoredPreferences } from "@/lib/storage";
+import { getStoredPreferences, saveStoredPreferences } from "@/lib/storage";
 import { getHijriDate } from "@/lib/hijriConverter";
 
 interface PrayerTimesCardProps {
@@ -43,12 +45,19 @@ export default function PrayerTimesCard({
   const [hijriTodayStr, setHijriTodayStr] = useState<string>("");
   const [hasNotificationPerm, setHasNotificationPerm] = useState(false);
   const [isPlayingSound, setIsPlayingSound] = useState(false);
+  const [preAdzanAlertEnabled, setPreAdzanAlertEnabled] = useState(true);
   const [, startTransition] = useTransition();
+
+  const lastNotified10mRef = useRef<string>("");
+  const lastNotifiedAdzanRef = useRef<string>("");
 
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
       setHasNotificationPerm(Notification.permission === "granted");
     }
+
+    const initialPrefs = getStoredPreferences();
+    setPreAdzanAlertEnabled(initialPrefs.preAdzanReminderEnabled);
 
     const updateTimes = () => {
       const now = new Date();
@@ -66,6 +75,44 @@ export default function PrayerTimesCard({
         const prefs = getStoredPreferences();
         const hijri = getHijriDate(now, prefs.hijriAdjustment);
         setHijriTodayStr(hijri.formatted);
+
+        // Check for automatic notification triggers
+        if (sched && sched.nextPrayer) {
+          const totalSecs = sched.timeToNext.totalSeconds;
+
+          // 1. Alarm 10 Menit Sebelum Adzan (Persiapan ke Masjid)
+          // Range 595 - 600 detik agar tidak terlewat
+          if (totalSecs <= 600 && totalSecs >= 595 && prefs.preAdzanReminderEnabled) {
+            const key10m = `${sched.nextPrayer.id}_10m_${sched.dateString}`;
+            if (lastNotified10mRef.current !== key10m) {
+              lastNotified10mRef.current = key10m;
+              soundEngine.playPreAdzanChime(prefs.audioVolume);
+              soundEngine.sendNotification(
+                `🕌 10 Menit Menuju Sholat ${sched.nextPrayer.name}!`,
+                `Waktunya bersiap ke masjid (${sched.nextPrayer.timeString}). Segera ambil wudhu untuk sholat berjamaah bersama imam.`
+              );
+            }
+          }
+
+          // 2. Notifikasi Waktu Sholat Tiba / Masuk Adzan (0 - 2 detik)
+          if (totalSecs <= 2 && totalSecs >= 0) {
+            const keyAdzan = `${sched.nextPrayer.id}_adzan_${sched.dateString}`;
+            if (lastNotifiedAdzanRef.current !== keyAdzan) {
+              lastNotifiedAdzanRef.current = keyAdzan;
+              if (prefs.audioEnabled) {
+                if (prefs.audioTone === "gentle_chime") {
+                  soundEngine.playGentleChime(prefs.audioVolume);
+                } else {
+                  soundEngine.playTakbirBeep(prefs.audioVolume);
+                }
+              }
+              soundEngine.sendNotification(
+                `📢 Waktu Sholat ${sched.nextPrayer.name} Telah Tiba!`,
+                `Allahu Akbar, Allahu Akbar. Waktu sholat ${sched.nextPrayer.name} (${sched.nextPrayer.timeString}) telah masuk di ${city.name}.`
+              );
+            }
+          }
+        }
       });
     };
 
@@ -80,6 +127,15 @@ export default function PrayerTimesCard({
     );
   }
 
+  const handleTogglePreAdzan = () => {
+    const nextVal = !preAdzanAlertEnabled;
+    setPreAdzanAlertEnabled(nextVal);
+    saveStoredPreferences({ preAdzanReminderEnabled: nextVal });
+    if (nextVal) {
+      soundEngine.playPreAdzanChime(0.6);
+    }
+  };
+
   const handleTestSound = () => {
     setIsPlayingSound(true);
     const prefs = getStoredPreferences();
@@ -88,6 +144,21 @@ export default function PrayerTimesCard({
     } else {
       soundEngine.playTakbirBeep(prefs.audioVolume);
     }
+    soundEngine.sendNotification(
+      `📢 [Tes] Waktu Sholat ${schedule.nextPrayer?.name} Tiba`,
+      `Simulasi notifikasi masuk waktu sholat ${schedule.nextPrayer?.name} (${schedule.nextPrayer?.timeString}).`
+    );
+    setTimeout(() => setIsPlayingSound(false), 2500);
+  };
+
+  const handleTest10mAlert = () => {
+    setIsPlayingSound(true);
+    const prefs = getStoredPreferences();
+    soundEngine.playPreAdzanChime(prefs.audioVolume);
+    soundEngine.sendNotification(
+      `🕌 [Tes] 10 Menit Menuju ${schedule.nextPrayer?.name}!`,
+      `Simulasi alarm persiapan ke masjid. Selesaikan pekerjaan dan ambil wudhu!`
+    );
     setTimeout(() => setIsPlayingSound(false), 2500);
   };
 
@@ -96,9 +167,10 @@ export default function PrayerTimesCard({
     setHasNotificationPerm(granted);
     if (granted) {
       soundEngine.sendNotification(
-        "Pengingat Sholat Uswah.id Aktif",
-        `Jadwal sholat otomatis aktif untuk wilayah ${city.name}.`
+        "🕌 Notifikasi Adzan Uswah.id Aktif!",
+        `Pengingat adzan & alarm persiapan 10 menit ke masjid kini aktif untuk wilayah ${city.name}.`
       );
+      soundEngine.playPreAdzanChime(0.5);
     }
   };
 
@@ -129,6 +201,8 @@ export default function PrayerTimesCard({
 
   const isUrgent =
     schedule.timeToNext.hours === 0 && schedule.timeToNext.minutes < 15;
+  const isPreAdzanActive =
+    schedule.timeToNext.totalSeconds <= 600 && schedule.timeToNext.totalSeconds > 0;
 
   return (
     <div
@@ -138,29 +212,51 @@ export default function PrayerTimesCard({
           : "border-emerald-500/25"
       }`}
     >
-      {/* Rotating Dynamic Celestial Astrolabe Ring Animation */}
+      {/* Rotating Dynamic Islamic Rub el Hizb & Celestial Astrolabe Ring Animation */}
       <div className="absolute -right-24 -top-24 w-[420px] h-[420px] pointer-events-none opacity-[0.08] dark:opacity-[0.14] animate-spin-slow">
         <svg viewBox="0 0 200 200" className="w-full h-full text-emerald-200 stroke-current fill-none">
+          {/* Concentric Astrolabe Coordinate Circles */}
           <circle cx="100" cy="100" r="92" strokeWidth="1" strokeDasharray="4 4" />
           <circle cx="100" cy="100" r="82" strokeWidth="1.5" />
           <circle cx="100" cy="100" r="66" strokeWidth="0.8" />
-          <circle cx="100" cy="100" r="48" strokeWidth="1.2" strokeDasharray="6 3" />
-          {Array.from({ length: 12 }).map((_, i) => (
+          <circle cx="100" cy="100" r="50" strokeWidth="1.2" strokeDasharray="6 3" />
+
+          {/* 16 Astrolabe Azimuth Radial Calibration Ticks */}
+          {Array.from({ length: 16 }).map((_, i) => (
             <line
               key={i}
               x1="100"
               y1="8"
               x2="100"
-              y2="22"
-              strokeWidth="1.5"
-              transform={`rotate(${i * 30} 100 100)`}
+              y2={i % 2 === 0 ? "24" : "18"}
+              strokeWidth={i % 4 === 0 ? "1.8" : "1"}
+              transform={`rotate(${i * 22.5} 100 100)`}
             />
           ))}
-          <polygon
-            points="100,28 116,68 158,68 124,94 137,136 100,110 63,136 76,94 42,68 84,68"
-            strokeWidth="1"
-            opacity="0.6"
+
+          {/* Authentic Islamic Rub el Hizb (8-Pointed Star - 2 concentric squares at 45°) */}
+          <rect
+            x="66"
+            y="66"
+            width="68"
+            height="68"
+            rx="3"
+            strokeWidth="1.3"
+            opacity="0.75"
           />
+          <rect
+            x="66"
+            y="66"
+            width="68"
+            height="68"
+            rx="3"
+            strokeWidth="1.3"
+            opacity="0.75"
+            transform="rotate(45 100 100)"
+          />
+          <circle cx="100" cy="100" r="26" strokeWidth="1" opacity="0.6" strokeDasharray="3 3" />
+          <circle cx="100" cy="100" r="14" strokeWidth="1.2" opacity="0.8" />
+          <circle cx="100" cy="100" r="3.5" fill="currentColor" opacity="0.9" />
         </svg>
       </div>
 
@@ -223,6 +319,40 @@ export default function PrayerTimesCard({
           </div>
         </div>
       </div>
+
+      {/* 10-Minute Pre-Adzan Mosque Preparation Alert Banner */}
+      {isPreAdzanActive && (
+        <div className="relative z-10 mb-6 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-500/25 via-amber-600/15 to-emerald-950/40 border-2 border-amber-400/60 backdrop-blur-xl shadow-xl shadow-amber-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-pulse-gentle">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="p-3 rounded-2xl bg-amber-400/25 text-amber-300 border border-amber-400/40 shadow-inner flex-shrink-0">
+              <BellRing className="w-6 h-6 text-amber-300 animate-bounce" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[11px] tracking-wider uppercase">
+                  🕌 10 Menit Menuju {schedule.nextPrayer?.name} ({schedule.nextPrayer?.timeString})
+                </span>
+                <span className="text-xs font-mono font-bold text-amber-300">
+                  Sisa {minutesStr}:{secondsStr}
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-amber-100/90 mt-1 leading-snug">
+                Waktunya bersiap ke masjid! Selesaikan aktivitas kantor/kamar, segera ambil wudhu dan berjalan ke masjid agar dapat takbiratul ihram bersama imam.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
+            <button
+              onClick={handleTest10mAlert}
+              type="button"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-md transition-all cursor-pointer"
+            >
+              <Volume2 className="w-3.5 h-3.5" />
+              <span>Tes Nada 10 Mnt</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Countdown & Next Prayer Hero Section */}
       <div
@@ -372,40 +502,73 @@ export default function PrayerTimesCard({
             </div>
 
             {/* Quick Action Controls */}
-            <div className="flex items-center justify-center gap-2 mt-4 w-full pt-3 border-t border-white/10">
-              <button
-                onClick={handleTestSound}
-                type="button"
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                  isPlayingSound
-                    ? "bg-amber-400 text-slate-950 border-amber-300 shadow-md shadow-amber-400/30 scale-95"
-                    : "bg-white/10 hover:bg-white/20 text-emerald-100 border-white/15"
-                }`}
-                title="Dengarkan simulasi nada adzan/pengingat sholat"
-              >
-                <Volume2
-                  className={`w-3.5 h-3.5 ${
-                    isPlayingSound ? "text-slate-950 animate-bounce" : "text-amber-300"
-                  }`}
-                />
-                <span>{isPlayingSound ? "Memutar Nada..." : "Tes Suara"}</span>
-              </button>
-
-              {!hasNotificationPerm ? (
+            <div className="flex flex-col gap-2 mt-4 w-full pt-3 border-t border-white/10">
+              <div className="flex items-center justify-center gap-1.5 flex-wrap">
                 <button
-                  onClick={handleEnableNotification}
+                  onClick={handleTest10mAlert}
                   type="button"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/25 hover:bg-amber-500/35 text-amber-200 border border-amber-400/40 transition-all cursor-pointer"
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                    isPlayingSound
+                      ? "bg-amber-400 text-slate-950 border-amber-300 shadow-md shadow-amber-400/30 scale-95"
+                      : "bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border-amber-400/35"
+                  }`}
+                  title="Dengarkan bunyi alarm pengingat 10 menit persiapan ke masjid"
                 >
-                  <Bell className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Nyalakan Notifikasi</span>
+                  <BellRing className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Tes 10 Mnt Masjid</span>
                 </button>
-              ) : (
-                <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                  <Check className="w-3 h-3 text-emerald-400" />
-                  <span>Notifikasi Aktif</span>
-                </div>
-              )}
+
+                <button
+                  onClick={handleTestSound}
+                  type="button"
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+                    isPlayingSound
+                      ? "bg-amber-400 text-slate-950 border-amber-300 shadow-md shadow-amber-400/30 scale-95"
+                      : "bg-white/10 hover:bg-white/20 text-emerald-100 border-white/15"
+                  }`}
+                  title="Dengarkan simulasi nada adzan/pengingat sholat"
+                >
+                  <Volume2
+                    className={`w-3.5 h-3.5 ${
+                      isPlayingSound ? "text-slate-950 animate-bounce" : "text-amber-300"
+                    }`}
+                  />
+                  <span>Tes Adzan</span>
+                </button>
+
+                {!hasNotificationPerm ? (
+                  <button
+                    onClick={handleEnableNotification}
+                    type="button"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/25 hover:bg-emerald-500/35 text-emerald-200 border border-emerald-400/40 transition-all cursor-pointer"
+                    title="Aktifkan notifikasi browser agar muncul pop-up saat adzan tiba"
+                  >
+                    <Bell className="w-3.5 h-3.5 text-emerald-300" />
+                    <span>Nyalakan Notifikasi</span>
+                  </button>
+                ) : (
+                  <div className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Notif Browser Aktif</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Pre-adzan Toggle & Explanation */}
+              <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5 text-[11px]">
+                <span className="text-emerald-200/80">Alarm 10 Mnt ke Masjid:</span>
+                <button
+                  onClick={handleTogglePreAdzan}
+                  type="button"
+                  className={`px-2 py-0.5 rounded-md font-bold text-[10px] transition-all cursor-pointer border ${
+                    preAdzanAlertEnabled
+                      ? "bg-amber-400 text-slate-950 border-amber-300 shadow-sm"
+                      : "bg-white/10 text-white/50 border-white/15 hover:bg-white/15"
+                  }`}
+                >
+                  {preAdzanAlertEnabled ? "AKTIF (Bunyi + Notif)" : "NONAKTIF"}
+                </button>
+              </div>
             </div>
           </div>
         </div>

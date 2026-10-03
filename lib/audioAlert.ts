@@ -51,6 +51,40 @@ class SoundEngine {
   }
 
   /**
+   * Nada Peringatan 10 Menit Sebelum Adzan (Persiapan ke Masjid / Wudhu)
+   * Chime 3 nada lembut nan tenang (C5 - E5 - G5)
+   */
+  public playPreAdzanChime(volume: number = 0.8) {
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    const notes = [
+      { freq: 523.25, time: 0 },    // C5
+      { freq: 659.25, time: 0.22 }, // E5
+      { freq: 783.99, time: 0.44 }, // G5
+    ];
+
+    const now = ctx.currentTime;
+    notes.forEach((n) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(n.freq, now + n.time);
+
+      gain.gain.setValueAtTime(0.001, now + n.time);
+      gain.gain.exponentialRampToValueAtTime(0.32 * volume, now + n.time + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + n.time + 1.2);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + n.time);
+      osc.stop(now + n.time + 1.25);
+    });
+  }
+
+  /**
    * Mainkan takbir nada singkat
    */
   public playTakbirBeep(volume: number = 0.8) {

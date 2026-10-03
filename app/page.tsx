@@ -8,6 +8,7 @@ import PrayerTimesCard from "@/components/prayer/PrayerTimesCard";
 import FastingCard from "@/components/fasting/FastingCard";
 import MonthGuidanceCard from "@/components/sunnah/MonthGuidanceCard";
 import TahajudDhuhaCard from "@/components/sunnah/TahajudDhuhaCard";
+import AsmaulHusnaHomeCard from "@/components/asmaul-husna/AsmaulHusnaHomeCard";
 import CitySelectorModal from "@/components/prayer/CitySelectorModal";
 import { CityLocation, DEFAULT_CITY } from "@/data/cities";
 import { getStoredPreferences, saveStoredPreferences } from "@/lib/storage";
@@ -163,8 +164,44 @@ export default function HomePage() {
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-emerald-300 group-hover:translate-x-1 transition-transform" />
               </Link>
+
+              <Link
+                href="/asmaul-husna"
+                className="flex items-center justify-between p-3 rounded-2xl bg-white/8 hover:bg-white/15 text-xs font-bold transition-all group border border-white/10 hover:border-emerald-400/30 hover:scale-[1.01]"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-amber-400/25 text-amber-300 group-hover:scale-105 transition-transform">
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                  </div>
+                  <span>99 Asmaul Husna &amp; Hafalan</span>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-300 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
           </div>
+        </section>
+
+        {/* Section: 99 Asmaul Husna & Program Hafalan */}
+        <section>
+          <div className="mb-3.5 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2 tracking-tight">
+                <Sparkles className="w-5 h-5 text-amber-500" />
+                <span>Asmaul Husna &amp; Program Hafalan</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                99 Nama Allah Yang Maha Indah, audio pelafalan, dan metode menghafal bertahap
+              </p>
+            </div>
+            <Link
+              href="/asmaul-husna"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40 hover:bg-emerald-100 transition-all"
+            >
+              <span>Buka Semua 99 Nama</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+          <AsmaulHusnaHomeCard />
         </section>
 
         {/* Section: Meneladani Rasulullah SAW di Bulan Ini */}

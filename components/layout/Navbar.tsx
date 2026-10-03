@@ -17,6 +17,7 @@ import {
   Smartphone,
   Sliders,
   RotateCcw,
+  Sparkles,
 } from "lucide-react";
 import { CityLocation } from "@/data/cities";
 import { getStoredPreferences, saveStoredPreferences } from "@/lib/storage";
@@ -87,6 +88,7 @@ export default function Navbar({
   const navLinks = [
     { href: "/", label: "Beranda", icon: Clock },
     { href: "/jadwal-sholat", label: "Jadwal Sholat", icon: Clock },
+    { href: "/asmaul-husna", label: "Asmaul Husna", icon: Sparkles },
     { href: "/kalender-hijriah", label: "Kalender Hijriah", icon: Calendar },
     { href: "/puasa-sunnah", label: "Puasa Sunnah", icon: Heart },
     { href: "/amalan-rasulullah", label: "Teladan Rasul", icon: BookOpen },

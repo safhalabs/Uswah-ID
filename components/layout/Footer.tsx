@@ -53,6 +53,11 @@ export default function Footer() {
                   Amalan 12 Bulan Hijriah
                 </Link>
               </li>
+              <li>
+                <Link href="/asmaul-husna" className="hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+                  99 Asmaul Husna
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

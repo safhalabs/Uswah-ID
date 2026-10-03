@@ -8,6 +8,8 @@ export interface UserPreferences {
   audioTone: "adzan_makkah" | "adzan_madinah" | "gentle_chime";
   darkMode: boolean;
   layoutMode: "auto" | "desktop" | "portrait" | "mobile";
+  preAdzanReminderEnabled: boolean;
+  preAdzanReminderMinutes: number; // default 10
   qadhaTarget: number;
   qadhaCompleted: number;
 }
@@ -20,6 +22,8 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   audioTone: "gentle_chime",
   darkMode: false,
   layoutMode: "auto",
+  preAdzanReminderEnabled: true,
+  preAdzanReminderMinutes: 10,
   qadhaTarget: 0,
   qadhaCompleted: 0,
 };
@@ -28,6 +32,7 @@ const STORAGE_KEYS = {
   PREFERENCES: "uswah_preferences_v1",
   AMALAN_CHECKLIST: "uswah_amalan_checklist_v1",
   FASTING_LOGS: "uswah_fasting_logs_v1",
+  ASMAUL_HUSNA_MEMORIZED: "uswah_asmaul_husna_memorized_v1",
 };
 
 export function getStoredPreferences(): UserPreferences {
@@ -146,3 +151,42 @@ export function removeFastingLog(id: string): FastingLogEntry[] {
     return [];
   }
 }
+
+export function getMemorizedAsmaulHusna(): number[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.ASMAUL_HUSNA_MEMORIZED);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export function toggleMemorizedAsmaulHusna(num: number): number[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const current = getMemorizedAsmaulHusna();
+    let updated: number[];
+    if (current.includes(num)) {
+      updated = current.filter((n) => n !== num);
+    } else {
+      updated = [...current, num];
+    }
+    localStorage.setItem(STORAGE_KEYS.ASMAUL_HUSNA_MEMORIZED, JSON.stringify(updated));
+    return updated;
+  } catch (e) {
+    console.error("Failed to update memorized Asmaul Husna", e);
+    return [];
+  }
+}
+
+export function resetMemorizedAsmaulHusna(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(STORAGE_KEYS.ASMAUL_HUSNA_MEMORIZED);
+  } catch (e) {
+    console.error("Failed to reset memorized Asmaul Husna", e);
+  }
+}
+

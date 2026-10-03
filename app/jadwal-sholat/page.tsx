@@ -5,11 +5,12 @@ import Navbar from "@/components/layout/Navbar";
 import BottomNav from "@/components/layout/BottomNav";
 import Footer from "@/components/layout/Footer";
 import PrayerTimesCard from "@/components/prayer/PrayerTimesCard";
+import TahajudDhuhaCard from "@/components/sunnah/TahajudDhuhaCard";
 import CitySelectorModal from "@/components/prayer/CitySelectorModal";
 import { CityLocation, DEFAULT_CITY } from "@/data/cities";
 import { getStoredPreferences, saveStoredPreferences } from "@/lib/storage";
 import { getMonthlyPrayerTimes, DayPrayerSchedule } from "@/lib/prayerCalculations";
-import { Printer, ChevronLeft, ChevronRight, Volume2, ShieldCheck } from "lucide-react";
+import { Printer, ChevronLeft, ChevronRight, Volume2, ShieldCheck, Sun } from "lucide-react";
 import { soundEngine } from "@/lib/audioAlert";
 
 export default function JadwalSholatPage() {
@@ -20,12 +21,24 @@ export default function JadwalSholatPage() {
   const [monthlySchedule, setMonthlySchedule] = useState<DayPrayerSchedule[]>([]);
   const [audioTone, setAudioTone] = useState<"gentle_chime" | "adzan_makkah">("gentle_chime");
   const [audioVolume, setAudioVolume] = useState<number>(0.8);
+  const [layoutMode, setLayoutMode] = useState<"auto" | "desktop" | "portrait" | "mobile">("auto");
+  const [isHardwarePortrait, setIsHardwarePortrait] = useState(false);
 
   useEffect(() => {
     const prefs = getStoredPreferences();
     if (prefs.city) setCurrentCity(prefs.city);
+    if (prefs.layoutMode) setLayoutMode(prefs.layoutMode);
     setAudioTone(prefs.audioTone === "gentle_chime" ? "gentle_chime" : "adzan_makkah");
     setAudioVolume(prefs.audioVolume);
+
+    if (typeof window !== "undefined") {
+      const media = window.matchMedia("(orientation: portrait) and (min-width: 768px)");
+      setIsHardwarePortrait(media.matches);
+
+      const handler = (e: MediaQueryListEvent) => setIsHardwarePortrait(e.matches);
+      media.addEventListener("change", handler);
+      return () => media.removeEventListener("change", handler);
+    }
   }, []);
 
   useEffect(() => {
@@ -53,14 +66,28 @@ export default function JadwalSholatPage() {
     "Juli", "Agustus", "September", "Oktober", "November", "Desember",
   ];
 
+  const isPortraitEffective =
+    layoutMode === "portrait" || (layoutMode === "auto" && isHardwarePortrait);
+  const isMobileEffective = layoutMode === "mobile";
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar
         currentCity={currentCity}
         onOpenCitySelector={() => setIsCityModalOpen(true)}
+        layoutMode={layoutMode}
+        onLayoutModeChange={(mode) => setLayoutMode(mode)}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+      <main
+        className={`flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 transition-all ${
+          isMobileEffective
+            ? "max-w-md"
+            : isPortraitEffective
+            ? "max-w-4xl portrait-monitor-container"
+            : "max-w-7xl"
+        }`}
+      >
         <section>
           <div className="mb-4">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
@@ -74,6 +101,24 @@ export default function JadwalSholatPage() {
           <PrayerTimesCard
             city={currentCity}
             onOpenCitySelector={() => setIsCityModalOpen(true)}
+            isPortraitMode={isPortraitEffective}
+          />
+        </section>
+
+        {/* Section: Rekomendasi Waktu Sholat Dhuha & Tahajud */}
+        <section>
+          <div className="mb-3.5">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2 tracking-tight">
+              <Sun className="w-5 h-5 text-amber-500" />
+              <span>Rekomendasi Waktu Sholat Sunnah</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Panduan astronomis waktu Dhuha &amp; Tahajud, peringatan batas akhir waktu sholat, dan keutamaan
+            </p>
+          </div>
+          <TahajudDhuhaCard
+            city={currentCity}
+            isPortraitMode={isPortraitEffective}
           />
         </section>
 

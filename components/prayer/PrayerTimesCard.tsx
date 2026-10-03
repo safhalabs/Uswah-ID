@@ -30,11 +30,13 @@ import { getHijriDate } from "@/lib/hijriConverter";
 interface PrayerTimesCardProps {
   city: CityLocation;
   onOpenCitySelector: () => void;
+  isPortraitMode?: boolean;
 }
 
 export default function PrayerTimesCard({
   city,
   onOpenCitySelector,
+  isPortraitMode = false,
 }: PrayerTimesCardProps) {
   const [schedule, setSchedule] = useState<DayPrayerSchedule | null>(null);
   const [currentTimeStr, setCurrentTimeStr] = useState<string>("");
@@ -129,7 +131,39 @@ export default function PrayerTimesCard({
     schedule.timeToNext.hours === 0 && schedule.timeToNext.minutes < 15;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#064e3b] via-[#043425] to-[#021b13] text-white p-5 sm:p-7 shadow-2xl shadow-emerald-950/30 border border-emerald-500/25">
+    <div
+      className={`relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#064e3b] via-[#043425] to-[#021b13] text-white p-5 sm:p-7 shadow-2xl shadow-emerald-950/30 border transition-all ${
+        isUrgent
+          ? "border-amber-400/60 shadow-[0_0_35px_rgba(245,158,11,0.25)] animate-pulse-gentle"
+          : "border-emerald-500/25"
+      }`}
+    >
+      {/* Rotating Dynamic Celestial Astrolabe Ring Animation */}
+      <div className="absolute -right-24 -top-24 w-[420px] h-[420px] pointer-events-none opacity-[0.08] dark:opacity-[0.14] animate-spin-slow">
+        <svg viewBox="0 0 200 200" className="w-full h-full text-emerald-200 stroke-current fill-none">
+          <circle cx="100" cy="100" r="92" strokeWidth="1" strokeDasharray="4 4" />
+          <circle cx="100" cy="100" r="82" strokeWidth="1.5" />
+          <circle cx="100" cy="100" r="66" strokeWidth="0.8" />
+          <circle cx="100" cy="100" r="48" strokeWidth="1.2" strokeDasharray="6 3" />
+          {Array.from({ length: 12 }).map((_, i) => (
+            <line
+              key={i}
+              x1="100"
+              y1="8"
+              x2="100"
+              y2="22"
+              strokeWidth="1.5"
+              transform={`rotate(${i * 30} 100 100)`}
+            />
+          ))}
+          <polygon
+            points="100,28 116,68 158,68 124,94 137,136 100,110 63,136 76,94 42,68 84,68"
+            strokeWidth="1"
+            opacity="0.6"
+          />
+        </svg>
+      </div>
+
       {/* Subtle Islamic Rosette / Radial Ambient Lights */}
       <div className="absolute top-0 right-0 -mr-24 -mt-24 w-96 h-96 rounded-full bg-emerald-400/15 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 -ml-24 -mb-24 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
@@ -167,10 +201,10 @@ export default function PrayerTimesCard({
           <div>
             <div className="flex items-center justify-end gap-2">
               <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="animate-radar-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
               </span>
-              <p className="text-2xl sm:text-3xl font-mono font-black tracking-tight text-white tabular-nums drop-shadow-md">
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-mono font-black tracking-tight text-white tabular-nums drop-shadow-md">
                 {currentTimeStr}
               </p>
             </div>
@@ -191,9 +225,13 @@ export default function PrayerTimesCard({
       </div>
 
       {/* Countdown & Next Prayer Hero Section */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mb-6 bg-black/35 backdrop-blur-xl p-5 sm:p-6 rounded-3xl border border-white/10 shadow-xl">
-        {/* Next Prayer Details (Col 7) */}
-        <div className="lg:col-span-7 space-y-3">
+      <div
+        className={`relative z-10 grid gap-6 items-center mb-6 bg-black/35 backdrop-blur-xl p-5 sm:p-6 rounded-3xl border border-white/10 shadow-xl ${
+          isPortraitMode ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-12"
+        }`}
+      >
+        {/* Next Prayer Details */}
+        <div className={`${isPortraitMode ? "" : "lg:col-span-7"} space-y-3`}>
           {/* Header Badges */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-400/25 to-amber-500/15 border border-amber-400/35 text-[11px] font-bold text-amber-300 tracking-wide uppercase">
@@ -236,7 +274,7 @@ export default function PrayerTimesCard({
             )}
           </p>
 
-          {/* Time Progress Bar */}
+          {/* Time Progress Bar With Laser Shimmer */}
           <div className="pt-2 max-w-lg">
             <div className="flex items-center justify-between text-[11px] text-emerald-200/90 mb-1.5 font-medium">
               <span className="flex items-center gap-1">
@@ -249,11 +287,13 @@ export default function PrayerTimesCard({
             </div>
             <div className="w-full h-2.5 rounded-full bg-black/40 border border-white/10 p-0.5 overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 shadow-[0_0_12px_rgba(52,211,153,0.5)] transition-all duration-1000"
+                className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 shadow-[0_0_14px_rgba(52,211,153,0.6)] transition-all duration-1000 relative overflow-hidden"
                 style={{
                   width: `${Math.min(100, Math.max(4, schedule.progressPercent))}%`,
                 }}
-              />
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full animate-shimmer" />
+              </div>
             </div>
           </div>
         </div>
@@ -372,7 +412,13 @@ export default function PrayerTimesCard({
       </div>
 
       {/* 8 Prayer Slots Grid (High Contrast, Professional & Responsive) */}
-      <div className="relative z-10 grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-2.5">
+      <div
+        className={`relative z-10 grid gap-2 sm:gap-2.5 ${
+          isPortraitMode
+            ? "grid-cols-2 sm:grid-cols-4"
+            : "grid-cols-4 sm:grid-cols-8"
+        }`}
+      >
         {schedule.items.map((item) => {
           const isNext = schedule.nextPrayer?.id === item.id;
           const isCurrent = schedule.currentPrayer?.id === item.id;

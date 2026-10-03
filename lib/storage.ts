@@ -7,6 +7,7 @@ export interface UserPreferences {
   audioVolume: number; // 0.0 - 1.0
   audioTone: "adzan_makkah" | "adzan_madinah" | "gentle_chime";
   darkMode: boolean;
+  layoutMode: "auto" | "desktop" | "portrait" | "mobile";
   qadhaTarget: number;
   qadhaCompleted: number;
 }
@@ -18,6 +19,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   audioVolume: 0.8,
   audioTone: "gentle_chime",
   darkMode: false,
+  layoutMode: "auto",
   qadhaTarget: 0,
   qadhaCompleted: 0,
 };
@@ -91,6 +93,10 @@ export function toggleDayAmalan(dateKey: string, amalanId: string): string[] {
     console.error("Failed to update amalan checklist", e);
     return [];
   }
+}
+
+export function isSunnahCompleted(dateKey: string, amalanId: string): boolean {
+  return getDayAmalan(dateKey).includes(amalanId);
 }
 
 export interface FastingLogEntry {

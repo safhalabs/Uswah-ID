@@ -7,20 +7,46 @@ import Footer from "@/components/layout/Footer";
 import PrayerTimesCard from "@/components/prayer/PrayerTimesCard";
 import FastingCard from "@/components/fasting/FastingCard";
 import MonthGuidanceCard from "@/components/sunnah/MonthGuidanceCard";
+import TahajudDhuhaCard from "@/components/sunnah/TahajudDhuhaCard";
 import CitySelectorModal from "@/components/prayer/CitySelectorModal";
 import { CityLocation, DEFAULT_CITY } from "@/data/cities";
 import { getStoredPreferences, saveStoredPreferences } from "@/lib/storage";
 import Link from "next/link";
-import { Calendar, Clock, BookOpen, Heart, ArrowRight, Sparkles, Compass } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  BookOpen,
+  Heart,
+  ArrowRight,
+  Sparkles,
+  Compass,
+  Sun,
+} from "lucide-react";
 
 export default function HomePage() {
   const [currentCity, setCurrentCity] = useState<CityLocation>(DEFAULT_CITY);
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<"auto" | "desktop" | "portrait" | "mobile">("auto");
+  const [isHardwarePortrait, setIsHardwarePortrait] = useState(false);
 
   useEffect(() => {
     const prefs = getStoredPreferences();
     if (prefs.city) {
       setCurrentCity(prefs.city);
+    }
+    if (prefs.layoutMode) {
+      setLayoutMode(prefs.layoutMode);
+    }
+
+    if (typeof window !== "undefined") {
+      const media = window.matchMedia("(orientation: portrait) and (min-width: 768px)");
+      setIsHardwarePortrait(media.matches);
+
+      const handler = (e: MediaQueryListEvent) => {
+        setIsHardwarePortrait(e.matches);
+      };
+      media.addEventListener("change", handler);
+      return () => media.removeEventListener("change", handler);
     }
   }, []);
 
@@ -29,19 +55,51 @@ export default function HomePage() {
     saveStoredPreferences({ city });
   };
 
+  const isPortraitEffective =
+    layoutMode === "portrait" || (layoutMode === "auto" && isHardwarePortrait);
+  const isMobileEffective = layoutMode === "mobile";
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar
         currentCity={currentCity}
         onOpenCitySelector={() => setIsCityModalOpen(true)}
+        layoutMode={layoutMode}
+        onLayoutModeChange={(mode) => setLayoutMode(mode)}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-6 sm:space-y-7">
+      <main
+        className={`flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-6 sm:space-y-7 transition-all ${
+          isMobileEffective
+            ? "max-w-md"
+            : isPortraitEffective
+            ? "max-w-4xl portrait-monitor-container"
+            : "max-w-7xl"
+        }`}
+      >
         {/* Hero Section: Jadwal Sholat Aktif & Live Countdown */}
         <section>
           <PrayerTimesCard
             city={currentCity}
             onOpenCitySelector={() => setIsCityModalOpen(true)}
+            isPortraitMode={isPortraitEffective}
+          />
+        </section>
+
+        {/* Section: Rekomendasi Waktu Sholat Dhuha & Tahajud */}
+        <section>
+          <div className="mb-3.5">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2 tracking-tight">
+              <Sun className="w-5 h-5 text-amber-500" />
+              <span>Rekomendasi Waktu Sholat Sunnah</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Panduan astronomis waktu Dhuha &amp; Tahajud, peringatan batas akhir waktu sholat, dan keutamaan
+            </p>
+          </div>
+          <TahajudDhuhaCard
+            city={currentCity}
+            isPortraitMode={isPortraitEffective}
           />
         </section>
 

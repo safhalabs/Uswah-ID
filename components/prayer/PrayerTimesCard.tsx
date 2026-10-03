@@ -11,6 +11,8 @@ import {
   Moon,
   Sparkles,
   MapPin,
+  ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import { CityLocation } from "@/data/cities";
 import {
@@ -36,7 +38,6 @@ export default function PrayerTimesCard({
   const [, startTransition] = useTransition();
 
   useEffect(() => {
-    // Periksa izin notifikasi
     if (typeof window !== "undefined" && "Notification" in window) {
       setHasNotificationPerm(Notification.permission === "granted");
     }
@@ -62,7 +63,7 @@ export default function PrayerTimesCard({
 
   if (!schedule) {
     return (
-      <div className="w-full h-72 rounded-3xl bg-slate-100 dark:bg-[#0c1e17] animate-pulse" />
+      <div className="w-full h-64 rounded-3xl bg-emerald-950/20 dark:bg-emerald-950/40 animate-pulse border border-emerald-900/10" />
     );
   }
 
@@ -81,7 +82,7 @@ export default function PrayerTimesCard({
     if (granted) {
       soundEngine.sendNotification(
         "Pengingat Sholat Uswah.id Aktif",
-        "Anda akan menerima pemberitahuan otomatis saat waktu sholat tiba."
+        `Jadwal sholat otomatis aktif untuk wilayah ${city.name}.`
       );
     }
   };
@@ -108,119 +109,152 @@ export default function PrayerTimesCard({
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-800 via-emerald-900 to-[#042417] text-white p-6 sm:p-8 shadow-xl shadow-emerald-950/20 border border-emerald-700/30">
-      {/* Decorative Islamic Star Pattern Overlay */}
-      <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-900 via-[#073623] to-[#031d14] text-white p-5 sm:p-7 shadow-xl shadow-emerald-950/25 border border-emerald-700/30">
+      {/* Decorative Atmospheric Radial Lights */}
+      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
 
-      {/* Top Bar: Current Time & Location */}
-      <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 mb-6 pb-5 border-b border-emerald-700/40">
+      {/* Top Bar: Location Switcher & Realtime Clock */}
+      <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-white/10">
         <button
           onClick={onOpenCitySelector}
           type="button"
-          className="flex items-center gap-2 group text-left cursor-pointer"
+          className="flex items-center gap-2.5 px-3 py-1.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/10 backdrop-blur-md transition-all group cursor-pointer"
         >
-          <div className="p-2 rounded-xl bg-emerald-700/60 group-hover:bg-emerald-600 transition-colors">
-            <MapPin className="w-4 h-4 text-emerald-300" />
+          <div className="p-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 group-hover:scale-105 transition-transform">
+            <MapPin className="w-3.5 h-3.5 text-emerald-300" />
           </div>
-          <div>
+          <div className="text-left">
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-base text-white group-hover:text-emerald-200 transition-colors">
+              <span className="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-200 transition-colors">
                 {city.name}
               </span>
-              <span className="text-xs text-emerald-300">({city.timezone})</span>
+              <span className="text-[10px] text-emerald-300 font-mono">({city.timezone})</span>
+              <ChevronRight className="w-3 h-3 text-emerald-300 opacity-60 group-hover:translate-x-0.5 transition-transform" />
             </div>
-            <p className="text-xs text-emerald-200/70">{city.province} • Ganti Lokasi</p>
+            <p className="text-[10px] text-emerald-200/70">{city.province} • Ganti Lokasi</p>
           </div>
         </button>
 
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-2xl font-mono font-bold tracking-tight text-white drop-shadow-sm">
-              {currentTimeStr}
+            <div className="flex items-center justify-end gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <p className="text-xl sm:text-2xl font-mono font-bold tracking-tight text-white tabular-nums drop-shadow-sm">
+                {currentTimeStr}
+              </p>
+            </div>
+            <p className="text-[11px] text-emerald-200/80 font-medium">
+              {schedule.dateString}
             </p>
-            <p className="text-xs text-emerald-200/80">{schedule.dateString}</p>
           </div>
         </div>
       </div>
 
-      {/* Next Prayer Countdown Hero */}
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 items-center mb-8">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-700/50 border border-emerald-600/40 text-xs font-medium text-emerald-200 mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>Menuju Waktu Sholat Berikutnya</span>
+      {/* Countdown & Next Prayer Hero Section */}
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-5 items-center mb-6 bg-black/25 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/10">
+        {/* Next Prayer Details */}
+        <div className="md:col-span-7 space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/30 text-[11px] font-semibold text-amber-300">
+              <Sparkles className="w-3 h-3 text-amber-300" />
+              Waktu Sholat Berikutnya
+            </span>
+            <span className="text-[10px] text-emerald-300/80 hidden sm:inline-flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3" /> Standar Kemenag RI (+2m)
+            </span>
           </div>
 
-          <div className="flex items-baseline gap-3">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <div className="flex items-baseline gap-3 flex-wrap">
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
               {schedule.nextPrayer?.name}
             </h2>
             <span className="text-xl sm:text-2xl font-serif text-emerald-300">
               {schedule.nextPrayer?.arabicName}
             </span>
-            <span className="text-lg font-mono font-semibold text-amber-300">
-              {schedule.nextPrayer?.timeString}
+            <span className="text-xl sm:text-2xl font-mono font-bold text-amber-300 tabular-nums">
+              {schedule.nextPrayer?.timeString} <span className="text-xs font-normal text-amber-200">{city.timezone}</span>
             </span>
           </div>
 
-          <p className="text-xs text-emerald-200/80 mt-1">
-            Standar Bimas Islam Kemenag RI (+2 menit waktu ihtiyat)
-          </p>
+          {/* Time Progress Bar */}
+          <div className="pt-2 max-w-md">
+            <div className="flex items-center justify-between text-[11px] text-emerald-200/80 mb-1">
+              <span>Fase waktu berjalan</span>
+              <span className="font-mono font-semibold text-amber-300">{schedule.progressPercent}%</span>
+            </div>
+            <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden p-0.5">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-amber-400 transition-all duration-1000"
+                style={{ width: `${Math.min(100, Math.max(5, schedule.progressPercent))}%` }}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Big Countdown Timer */}
-        <div className="flex flex-col items-start md:items-end">
-          <div className="flex items-center gap-2 font-mono">
-            <div className="flex flex-col items-center bg-black/30 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/10 shadow-inner">
-              <span className="text-2xl sm:text-3xl font-extrabold text-white">
+        {/* Compact Countdown Timers & Controls */}
+        <div className="md:col-span-5 flex flex-col items-start md:items-end justify-center">
+          <p className="text-[10px] uppercase font-bold tracking-wider text-emerald-300/90 mb-1.5">
+            Sisa Waktu Menuju {schedule.nextPrayer?.name}
+          </p>
+
+          <div className="flex items-center gap-1.5 font-mono">
+            {/* Hours */}
+            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-sm w-13 sm:w-15 h-13 sm:h-14 rounded-xl border border-white/15 shadow-inner">
+              <span className="text-xl sm:text-2xl font-black text-white tabular-nums leading-none">
                 {String(schedule.timeToNext.hours).padStart(2, "0")}
               </span>
-              <span className="text-[10px] uppercase tracking-wider text-emerald-300">Jam</span>
+              <span className="text-[9px] uppercase tracking-wider text-emerald-300 mt-1">Jam</span>
             </div>
-            <span className="text-2xl font-bold text-emerald-400">:</span>
-            <div className="flex flex-col items-center bg-black/30 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/10 shadow-inner">
-              <span className="text-2xl sm:text-3xl font-extrabold text-white">
+
+            <span className="text-xl font-bold text-emerald-400/80">:</span>
+
+            {/* Minutes */}
+            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-sm w-13 sm:w-15 h-13 sm:h-14 rounded-xl border border-white/15 shadow-inner">
+              <span className="text-xl sm:text-2xl font-black text-white tabular-nums leading-none">
                 {String(schedule.timeToNext.minutes).padStart(2, "0")}
               </span>
-              <span className="text-[10px] uppercase tracking-wider text-emerald-300">Menit</span>
+              <span className="text-[9px] uppercase tracking-wider text-emerald-300 mt-1">Mnt</span>
             </div>
-            <span className="text-2xl font-bold text-emerald-400">:</span>
-            <div className="flex flex-col items-center bg-black/30 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/10 shadow-inner">
-              <span className="text-2xl sm:text-3xl font-extrabold text-amber-300">
+
+            <span className="text-xl font-bold text-emerald-400/80">:</span>
+
+            {/* Seconds */}
+            <div className="flex flex-col items-center justify-center bg-white/10 backdrop-blur-sm w-13 sm:w-15 h-13 sm:h-14 rounded-xl border border-white/15 shadow-inner">
+              <span className="text-xl sm:text-2xl font-black text-amber-300 tabular-nums leading-none">
                 {String(schedule.timeToNext.seconds).padStart(2, "0")}
               </span>
-              <span className="text-[10px] uppercase tracking-wider text-emerald-300">Detik</span>
+              <span className="text-[9px] uppercase tracking-wider text-amber-200 mt-1">Dtk</span>
             </div>
           </div>
 
           {/* Quick Sound & Notification buttons */}
-          <div className="flex items-center gap-2 mt-3">
+          <div className="flex items-center gap-2 mt-3 flex-wrap">
             <button
               onClick={handleTestSound}
               type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-medium bg-white/10 hover:bg-white/20 text-emerald-100 transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-white/10 hover:bg-white/20 text-emerald-100 border border-white/10 transition-colors"
             >
-              <Volume2 className="w-3.5 h-3.5 text-amber-300" />
-              <span>Tes Nada Pengingat</span>
+              <Volume2 className="w-3 h-3 text-amber-300" />
+              <span>Tes Suara</span>
             </button>
 
             {!hasNotificationPerm && (
               <button
                 onClick={handleEnableNotification}
                 type="button"
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-medium bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/30 transition-colors"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-amber-500/25 hover:bg-amber-500/35 text-amber-200 border border-amber-400/40 transition-colors"
               >
-                <Bell className="w-3.5 h-3.5" />
-                <span>Aktifkan Notifikasi</span>
+                <Bell className="w-3 h-3" />
+                <span>Nyalakan Notifikasi</span>
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Prayer Times Grid */}
-      <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
+      {/* 8 Prayer Slots Grid (Compact & Informative) */}
+      <div className="relative z-10 grid grid-cols-4 sm:grid-cols-8 gap-2">
         {schedule.items.map((item) => {
           const isNext = schedule.nextPrayer?.id === item.id;
           const isCurrent = schedule.currentPrayer?.id === item.id;
@@ -229,38 +263,48 @@ export default function PrayerTimesCard({
           return (
             <div
               key={item.id}
-              className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${
+              className={`relative flex flex-col items-center justify-center py-2.5 px-1.5 sm:px-2 rounded-2xl transition-all ${
                 isNext
-                  ? "bg-gradient-to-b from-amber-400/25 to-amber-500/10 border-2 border-amber-400 text-white shadow-lg shadow-amber-500/20 scale-[1.02]"
+                  ? "bg-gradient-to-b from-amber-400/25 to-amber-500/10 border-2 border-amber-400 text-white shadow-lg shadow-amber-500/20 scale-[1.02] ring-2 ring-amber-400/20"
                   : isCurrent
-                  ? "bg-emerald-700/60 border border-emerald-400/40 text-emerald-100"
-                  : "bg-black/20 hover:bg-black/30 border border-white/5 text-emerald-100/90"
+                  ? "bg-emerald-700/60 border border-emerald-400/50 text-emerald-50"
+                  : "bg-white/5 hover:bg-white/10 border border-white/10 text-emerald-100/90"
               }`}
             >
-              {isNext && (
-                <span className="absolute -top-2.5 px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase bg-amber-400 text-amber-950 rounded-full shadow-sm">
+              {/* Badge "Berikutnya" or "Fardhu" */}
+              {isNext ? (
+                <span className="absolute -top-2.5 px-1.5 py-0.5 text-[8px] font-bold tracking-wider uppercase bg-amber-400 text-slate-950 rounded-full shadow-xs">
                   Berikutnya
                 </span>
-              )}
+              ) : isCurrent ? (
+                <span className="absolute -top-2 px-1.5 py-0.2 text-[8px] font-bold tracking-wider uppercase bg-emerald-500 text-white rounded-full">
+                  Saat ini
+                </span>
+              ) : null}
 
-              <div className="flex items-center gap-1 mb-1">
+              <div className="flex items-center gap-1 mb-0.5">
                 <Icon
                   className={`w-3.5 h-3.5 ${
-                    isNext ? "text-amber-300" : "text-emerald-300/80"
+                    isNext ? "text-amber-300" : isCurrent ? "text-emerald-300" : "text-emerald-300/70"
                   }`}
                 />
-                <span className="text-xs font-semibold">{item.name}</span>
+                <span className="text-[11px] sm:text-xs font-semibold">{item.name}</span>
               </div>
 
-              <span className="text-[11px] font-serif opacity-70 mb-1">{item.arabicName}</span>
+              <span className="text-[9px] font-serif opacity-70 mb-0.5">{item.arabicName}</span>
 
               <span
-                className={`text-lg font-mono font-bold tracking-tight ${
+                className={`text-sm sm:text-base font-mono font-bold tracking-tight tabular-nums ${
                   isNext ? "text-amber-300 drop-shadow" : "text-white"
                 }`}
               >
                 {item.timeString}
               </span>
+
+              {/* Fardhu Indicator Dot */}
+              {item.isFardhu && !isNext && !isCurrent && (
+                <span className="w-1 h-1 rounded-full bg-emerald-400/60 mt-0.5" title="Sholat Fardhu" />
+              )}
             </div>
           );
         })}

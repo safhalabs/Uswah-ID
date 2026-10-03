@@ -11,7 +11,7 @@ import CitySelectorModal from "@/components/prayer/CitySelectorModal";
 import { CityLocation, DEFAULT_CITY } from "@/data/cities";
 import { getStoredPreferences, saveStoredPreferences } from "@/lib/storage";
 import Link from "next/link";
-import { Calendar, Clock, BookOpen, Heart, ArrowRight } from "lucide-react";
+import { Calendar, Clock, BookOpen, Heart, ArrowRight, Sparkles, Compass } from "lucide-react";
 
 export default function HomePage() {
   const [currentCity, setCurrentCity] = useState<CityLocation>(DEFAULT_CITY);
@@ -36,7 +36,7 @@ export default function HomePage() {
         onOpenCitySelector={() => setIsCityModalOpen(true)}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-6 sm:space-y-7">
         {/* Hero Section: Jadwal Sholat Aktif & Live Countdown */}
         <section>
           <PrayerTimesCard
@@ -46,47 +46,64 @@ export default function HomePage() {
         </section>
 
         {/* 2-Column Section: Pengingat Puasa & Quick Nav */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2">
             <FastingCard />
           </div>
 
-          {/* Quick Access Card */}
-          <div className="rounded-3xl bg-gradient-to-br from-emerald-900 to-emerald-950 text-white p-6 shadow-sm border border-emerald-800/40 flex flex-col justify-between">
+          {/* Quick Access Card (Modern & Compact) */}
+          <div className="rounded-3xl bg-gradient-to-br from-emerald-900 via-[#073623] to-[#042417] text-white p-5 sm:p-6 shadow-xs border border-emerald-800/40 flex flex-col justify-between">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-800/80 text-emerald-200 text-xs font-semibold mb-3">
-                <BookOpen className="w-3.5 h-3.5 text-amber-300" />
-                <span>Uswah.id</span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-800/80 text-emerald-200 text-[11px] font-semibold mb-3 border border-emerald-700/60">
+                <Sparkles className="w-3 h-3 text-amber-300" />
+                <span>Uswatun Hasanah</span>
               </div>
-              <h3 className="text-xl font-bold mb-2">
-                Meneladani Akhlak & Ibadah Rasulullah
+              <h3 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug">
+                Meneladani Ibadah &amp; Akhlak Rasulullah
               </h3>
               <p className="text-xs text-emerald-100/80 leading-relaxed">
                 Setiap bulan dalam kalender Hijriah menyimpan jejak sejarah agung dan sunnah mulia yang dapat kita amalkan dalam kehidupan sehari-hari.
               </p>
             </div>
 
-            <div className="mt-6 space-y-2">
+            <div className="mt-5 space-y-2">
               <Link
                 href="/kalender-hijriah"
-                className="flex items-center justify-between p-3 rounded-2xl bg-white/10 hover:bg-white/20 text-xs font-semibold transition-colors"
+                className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl bg-white/10 hover:bg-white/15 text-xs font-semibold transition-all group border border-white/5"
               >
                 <div className="flex items-center gap-2.5">
-                  <Calendar className="w-4 h-4 text-emerald-300" />
-                  <span>Buka Kalender Hijriah Lengkap</span>
+                  <div className="p-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 group-hover:scale-105 transition-transform">
+                    <Calendar className="w-3.5 h-3.5 text-emerald-300" />
+                  </div>
+                  <span>Kalender Hijriah &amp; Puasa</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-emerald-300" />
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-300 group-hover:translate-x-1 transition-transform" />
               </Link>
 
               <Link
                 href="/jadwal-sholat"
-                className="flex items-center justify-between p-3 rounded-2xl bg-white/10 hover:bg-white/20 text-xs font-semibold transition-colors"
+                className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl bg-white/10 hover:bg-white/15 text-xs font-semibold transition-all group border border-white/5"
               >
                 <div className="flex items-center gap-2.5">
-                  <Clock className="w-4 h-4 text-emerald-300" />
+                  <div className="p-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 group-hover:scale-105 transition-transform">
+                    <Clock className="w-3.5 h-3.5 text-emerald-300" />
+                  </div>
                   <span>Jadwal Sholat 1 Bulan Penuh</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-emerald-300" />
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-300 group-hover:translate-x-1 transition-transform" />
+              </Link>
+
+              <Link
+                href="/amalan-rasulullah"
+                className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl bg-white/10 hover:bg-white/15 text-xs font-semibold transition-all group border border-white/5"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 group-hover:scale-105 transition-transform">
+                    <Compass className="w-3.5 h-3.5 text-emerald-300" />
+                  </div>
+                  <span>Peta Amalan 12 Bulan Hijriah</span>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-300 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>
@@ -94,13 +111,13 @@ export default function HomePage() {
 
         {/* Section: Meneladani Rasulullah SAW di Bulan Ini */}
         <section>
-          <div className="mb-4">
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Heart className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+          <div className="mb-3.5">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <Heart className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-600/20" />
               <span>Meneladani Rasulullah SAW Bulan Ini</span>
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Amalan sunnah berdalil hadits shahih & napak tilas sirah nabawiyah
+              Amalan sunnah berdalil hadits shahih &amp; napak tilas sirah nabawiyah
             </p>
           </div>
           <MonthGuidanceCard />

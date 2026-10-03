@@ -18,6 +18,7 @@ import { CityLocation } from "@/data/cities";
 import { getStoredPreferences, saveStoredPreferences } from "@/lib/storage";
 import { getHijriDate } from "@/lib/hijriConverter";
 import { soundEngine } from "@/lib/audioAlert";
+import Logo from "@/components/ui/Logo";
 
 interface NavbarProps {
   currentCity: CityLocation;
@@ -70,35 +71,20 @@ export default function Navbar({ currentCity, onOpenCitySelector }: NavbarProps)
     { href: "/jadwal-sholat", label: "Jadwal Sholat", icon: Clock },
     { href: "/kalender-hijriah", label: "Kalender Hijriah", icon: Calendar },
     { href: "/puasa-sunnah", label: "Puasa Sunnah", icon: Heart },
-    { href: "/amalan-rasulullah", label: "Teladan Rasulullah", icon: BookOpen },
+    { href: "/amalan-rasulullah", label: "Teladan Rasul", icon: BookOpen },
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-emerald-900/10 dark:border-emerald-500/20 bg-white/80 dark:bg-[#07130e]/80 backdrop-blur-md transition-colors">
+    <header className="sticky top-0 z-40 w-full border-b border-emerald-900/10 dark:border-emerald-500/20 bg-white/85 dark:bg-[#07130e]/85 backdrop-blur-md transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo & Brand */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center text-white shadow-md shadow-emerald-700/20 group-hover:scale-105 transition-transform">
-              <span className="font-bold text-xl tracking-tight">أ</span>
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-xl tracking-tight text-emerald-950 dark:text-emerald-50">
-                  Uswah<span className="text-emerald-600 dark:text-emerald-400">.id</span>
-                </span>
-                <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300 rounded-full">
-                  Kemenag RI
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-                {hijriToday || "Meneladani Sunnah Rasulullah SAW"}
-              </p>
-            </div>
+          {/* Logo & Brand with vector mark */}
+          <Link href="/" className="group py-1">
+            <Logo size="md" />
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+          <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const Icon = link.icon;
@@ -106,13 +92,13 @@ export default function Navbar({ currentCity, onOpenCitySelector }: NavbarProps)
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     isActive
-                      ? "bg-emerald-100/80 text-emerald-900 dark:bg-emerald-900/50 dark:text-emerald-200 shadow-sm"
-                      : "text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/40"
+                      ? "bg-emerald-100/90 text-emerald-900 dark:bg-emerald-900/60 dark:text-emerald-200 shadow-xs"
+                      : "text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/40"
                   }`}
                 >
-                  <Icon className="w-4 h-4 opacity-70" />
+                  <Icon className="w-3.5 h-3.5 opacity-70" />
                   <span>{link.label}</span>
                 </Link>
               );
@@ -121,24 +107,24 @@ export default function Navbar({ currentCity, onOpenCitySelector }: NavbarProps)
 
           {/* Quick Actions (Location, Sound, Theme) */}
           <div className="flex items-center gap-2">
-            {/* City Chip */}
+            {/* City Selector Chip */}
             <button
               onClick={onOpenCitySelector}
               type="button"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-200 border border-emerald-200/60 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 transition-colors shadow-sm"
-              title="Ubah Kota Lokasi"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/80 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-200 dark:hover:bg-emerald-900 border border-emerald-200/80 dark:border-emerald-800/80 transition-all shadow-xs group"
+              title="Ganti Kota Lokasi Sholat"
             >
-              <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span className="max-w-[100px] sm:max-w-[130px] truncate">{currentCity.name}</span>
+              <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
+              <span className="max-w-[95px] sm:max-w-[130px] truncate">{currentCity.name}</span>
             </button>
 
-            {/* Audio Toggle */}
+            {/* Audio Alert Toggle */}
             <button
               onClick={toggleAudio}
               type="button"
-              className={`p-2 rounded-full border transition-colors ${
+              className={`p-2 rounded-xl border transition-all ${
                 audioEnabled
-                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800"
+                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/80 hover:bg-emerald-100/60 shadow-xs"
                   : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 border-slate-200 dark:border-slate-700"
               }`}
               title={audioEnabled ? "Pengingat Suara Aktif" : "Pengingat Suara Senyap"}
@@ -150,8 +136,8 @@ export default function Navbar({ currentCity, onOpenCitySelector }: NavbarProps)
             <button
               onClick={toggleDarkMode}
               type="button"
-              className="p-2 rounded-full border border-slate-200 dark:border-emerald-800/60 bg-white dark:bg-emerald-950/40 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-emerald-900/60 transition-colors"
-              title={isDark ? "Mode Terang" : "Mode Gelap"}
+              className="p-2 rounded-xl border border-slate-200 dark:border-emerald-800/60 bg-white dark:bg-emerald-950/40 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-emerald-900/60 transition-colors shadow-xs"
+              title={isDark ? "Ganti ke Mode Terang" : "Ganti ke Mode Gelap"}
             >
               {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
             </button>

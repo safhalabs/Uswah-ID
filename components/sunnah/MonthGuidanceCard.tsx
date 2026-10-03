@@ -96,7 +96,12 @@ export default function MonthGuidanceCard() {
             </button>
 
             {isMonthDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-[#0c1f18] text-slate-800 dark:text-slate-100 shadow-xl border border-slate-200 dark:border-emerald-900/60 py-2 z-30 max-h-64 overflow-y-auto">
+              <>
+                <div
+                  className="fixed inset-0 z-20"
+                  onClick={() => setIsMonthDropdownOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-[#0c1f18] text-slate-800 dark:text-slate-100 shadow-xl border border-slate-200 dark:border-emerald-900/60 py-2 z-30 max-h-64 overflow-y-auto">
                 {ISLAMIC_MONTHS.map((m) => (
                   <button
                     key={m.monthIndex}
@@ -115,7 +120,8 @@ export default function MonthGuidanceCard() {
                   </button>
                 ))}
               </div>
-            )}
+            </>
+          )}
           </div>
         </div>
 

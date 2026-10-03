@@ -1,7 +1,7 @@
 {
   "name": "Uswah.id — Pengingat Sholat, Kalender Hijriah & Meneladani Sunnah",
   "short_name": "Uswah.id",
-  "description": "Aplikasi Islami penuntun jadwal sholat Kemenag, kalender Hijriah, puasa sunnah, dan amalan meneladani Rasulullah SAW.",
+  "description": "Aplikasi Islami penuntun jadwal sholat Kemenag RI, kalender Hijriah, puasa sunnah, dan amalan meneladani Rasulullah SAW.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#064e3b",
@@ -9,14 +9,15 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     }
   ]
 }

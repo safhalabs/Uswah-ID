@@ -14,21 +14,30 @@
   }
 
   body {
-    @apply bg-emerald-50/40 text-slate-800 dark:bg-[#07130e] dark:text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white transition-colors duration-200;
+    @apply bg-emerald-50/40 text-slate-800 dark:bg-[#06150f] dark:text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white transition-colors duration-200;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Make tabular numbers default for monospace clocks */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Islamic Geometric Background Pattern */
+/* Islamic Geometric Subtle Background Pattern */
 .islamic-bg-pattern {
   background-color: transparent;
-  background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1.5px, transparent 1.5px), radial-gradient(rgba(245, 158, 11, 0.05) 1.5px, transparent 1.5px);
+  background-image: 
+    radial-gradient(rgba(16, 185, 129, 0.08) 1.5px, transparent 1.5px),
+    radial-gradient(rgba(245, 158, 11, 0.05) 1.5px, transparent 1.5px);
   background-size: 32px 32px;
   background-position: 0 0, 16px 16px;
 }
 
 .dark .islamic-bg-pattern {
-  background-image: radial-gradient(rgba(16, 185, 129, 0.06) 1.5px, transparent 1.5px), radial-gradient(rgba(245, 158, 11, 0.04) 1.5px, transparent 1.5px);
+  background-image: 
+    radial-gradient(rgba(16, 185, 129, 0.06) 1.5px, transparent 1.5px),
+    radial-gradient(rgba(245, 158, 11, 0.04) 1.5px, transparent 1.5px);
 }
 
 /* Custom Scrollbar */
@@ -42,10 +51,25 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.25);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.45);
+}
+
+/* Modern Glass Card Utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(16, 185, 129, 0.12);
+}
+
+.dark .glass-panel {
+  background: rgba(12, 31, 24, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }

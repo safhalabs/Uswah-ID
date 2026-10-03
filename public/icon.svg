@@ -56,7 +56,6 @@
 
   <!-- 8-Pointed Star (Kawkab) at the Heart of the Crescent -->
   <g transform="translate(315 220) scale(1.15)">
-    <!-- 8-point geometric star -->
     <path d="M 0 -22 L 5 -7 L 20 -5 L 8 4 L 12 19 L 0 10 L -12 19 L -8 4 L -20 -5 L -5 -7 Z" 
           fill="#ffffff" 
           filter="drop-shadow(0 0 10px rgba(255, 255, 255, 0.8))" />

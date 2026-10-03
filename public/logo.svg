@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 160" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient for Icon -->
+    <linearGradient id="logoBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#065f46" />
+      <stop offset="50%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#064e3b" />
+    </linearGradient>
+
+    <!-- Gold Accent Gradient -->
+    <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="45%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left Icon Mark -->
+  <g transform="translate(16 16)">
+    <!-- Squircle Container -->
+    <rect width="128" height="128" rx="34" fill="url(#logoBgGrad)" />
+    <rect width="126" height="126" x="1" y="1" rx="33" fill="none" stroke="url(#logoGold)" stroke-width="1.5" opacity="0.4" />
+    
+    <!-- Octagram Rub el Hizb subtle lines -->
+    <g transform="translate(64 64)" opacity="0.25">
+      <rect x="-35" y="-35" width="70" height="70" rx="4" fill="none" stroke="#6ee7b7" stroke-width="1.5" />
+      <rect x="-35" y="-35" width="70" height="70" rx="4" fill="none" stroke="#6ee7b7" stroke-width="1.5" transform="rotate(45)" />
+    </g>
+
+    <!-- Mihrab Silhouette -->
+    <path d="M 46 95 L 46 70 C 46 55 54 45 64 39 C 74 45 82 55 82 70 L 82 95 Z" 
+          fill="none" stroke="#34d399" stroke-width="2" opacity="0.5" stroke-linecap="round" />
+
+    <!-- Crescent Moon -->
+    <path d="M 69 43 A 23 23 0 1 0 89 81 A 20 20 0 1 1 69 43 Z" fill="url(#logoGold)" />
+
+    <!-- 8-Point Star -->
+    <g transform="translate(79 55) scale(0.35)">
+      <path d="M 0 -22 L 5 -7 L 20 -5 L 8 4 L 12 19 L 0 10 L -12 19 L -8 4 L -20 -5 L -5 -7 Z" fill="#ffffff" />
+    </g>
+
+    <!-- Bottom arc -->
+    <path d="M 54 95 C 59 92 69 92 74 95" stroke="url(#logoGold)" stroke-width="2" stroke-linecap="round" opacity="0.9" />
+  </g>
+
+  <!-- Typography Brand Right -->
+  <g transform="translate(164 42)">
+    <!-- "Uswah" text -->
+    <text x="0" y="52" font-family="system-ui, -apple-system, 'Inter', 'Segoe UI', sans-serif" font-size="52" font-weight="900" letter-spacing="-1.5" fill="#047857">
+      Uswah<tspan fill="#f59e0b">.id</tspan>
+    </text>
+
+    <!-- Tagline & Kemenag badge -->
+    <text x="2" y="80" font-family="system-ui, -apple-system, 'Inter', 'Segoe UI', sans-serif" font-size="14" font-weight="600" letter-spacing="1.5" fill="#059669" text-transform="uppercase">
+      TELADAN IBADAH &amp; SUNNAH
+    </text>
+
+    <!-- Kemenag Pill -->
+    <g transform="translate(290 20)">
+      <rect width="112" height="24" rx="12" fill="#d1fae5" />
+      <text x="56" y="16" font-family="system-ui, -apple-system, 'Inter', sans-serif" font-size="10" font-weight="700" fill="#065f46" text-anchor="middle" letter-spacing="0.5">
+        STANDAR KEMENAG
+      </text>
+    </g>
+  </g>
+</svg>

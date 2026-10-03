@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 140 20% 98%;
+    --foreground: 160 30% 12%;
+  }
+
+  .dark {
+    --background: 160 35% 5%;
+    --foreground: 140 20% 95%;
+  }
+
+  body {
+    @apply bg-emerald-50/40 text-slate-800 dark:bg-[#07130e] dark:text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white transition-colors duration-200;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Islamic Geometric Background Pattern */
+.islamic-bg-pattern {
+  background-color: transparent;
+  background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1.5px, transparent 1.5px), radial-gradient(rgba(245, 158, 11, 0.05) 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+}
+
+.dark .islamic-bg-pattern {
+  background-image: radial-gradient(rgba(16, 185, 129, 0.06) 1.5px, transparent 1.5px), radial-gradient(rgba(245, 158, 11, 0.04) 1.5px, transparent 1.5px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.2);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.4);
+}

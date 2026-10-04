@@ -9,6 +9,7 @@ import FastingCard from "@/components/fasting/FastingCard";
 import MonthGuidanceCard from "@/components/sunnah/MonthGuidanceCard";
 import TahajudDhuhaCard from "@/components/sunnah/TahajudDhuhaCard";
 import AsmaulHusnaHomeCard from "@/components/asmaul-husna/AsmaulHusnaHomeCard";
+import PwaInstallPrompt from "@/components/pwa/PwaInstallPrompt";
 import CitySelectorModal from "@/components/prayer/CitySelectorModal";
 import { CityLocation, DEFAULT_CITY } from "@/data/cities";
 import { getStoredPreferences, saveStoredPreferences } from "@/lib/storage";
@@ -228,6 +229,8 @@ export default function HomePage() {
         currentCity={currentCity}
         onSelectCity={handleSelectCity}
       />
+
+      <PwaInstallPrompt />
     </div>
   );
 }

@@ -322,3 +322,84 @@ export function calculateTahajudSchedule(
     warningMessage,
   };
 }
+
+export interface WaktuTahrimInfo {
+  isTahrim: boolean;
+  type: "syuruq" | "istiwa" | "ghurub" | "none";
+  title: string;
+  timeRange: string;
+  description: string;
+  dalil: string;
+}
+
+/**
+ * Mendeteksi 3 Waktu Terlarang Sholat Sunnah (Waktu Tahrim)
+ * Sesuai Hadits Shahih HR. Muslim no. 832
+ */
+export function calculateWaktuTahrim(
+  city: CityLocation,
+  now: Date = new Date(),
+  prayerSchedule?: DayPrayerSchedule
+): WaktuTahrimInfo {
+  const sched = prayerSchedule || calculatePrayerTimes(city, now);
+  const nowMs = now.getTime();
+
+  const sunriseItem = sched.items.find((i) => i.id === "sunrise");
+  const dhuhrItem = sched.items.find((i) => i.id === "dhuhr");
+  const maghribItem = sched.items.find((i) => i.id === "maghrib");
+
+  const sunrise = sunriseItem ? new Date(sunriseItem.date) : new Date(now);
+  const dhuhr = dhuhrItem ? new Date(dhuhrItem.date) : new Date(now);
+  const maghrib = maghribItem ? new Date(maghribItem.date) : new Date(now);
+
+  // 1. Waktu Terbit Matahari s/d Naik Setinggi Tombak (Syuruq s/d Syuruq + 15 menit)
+  const syuruqEnd = new Date(sunrise.getTime() + 15 * 60000);
+  if (nowMs >= sunrise.getTime() && nowMs < syuruqEnd.getTime()) {
+    return {
+      isTahrim: true,
+      type: "syuruq",
+      title: "Waktu Terlarang: Terbit Matahari (Tanduk Syetan)",
+      timeRange: `${formatTime(sunrise)} - ${formatTime(syuruqEnd)}`,
+      description: "Dilarang melaksanakan sholat sunnah muthlaq saat matahari persis terbit hingga naik setinggi satu tombak (sekitar 15 menit setelah terbit).",
+      dalil: "HR. Muslim no. 832: 'Saat matahari terbit hingga ia naik tinggi.'",
+    };
+  }
+
+  // 2. Waktu Istiwa' (Matahari Tepat di Tengah Langit - Sebelum Dzuhur)
+  // ~12 menit sebelum adzan Dzuhur
+  const istiwaStart = new Date(dhuhr.getTime() - 12 * 60000);
+  if (nowMs >= istiwaStart.getTime() && nowMs < dhuhr.getTime()) {
+    return {
+      isTahrim: true,
+      type: "istiwa",
+      title: "Waktu Terlarang: Istiwa' (Tengah Hari Sebelum Dzuhur)",
+      timeRange: `${formatTime(istiwaStart)} - ${formatTime(dhuhr)}`,
+      description: "Dilarang sholat sunnah ketika matahari tepat berada di puncak langit hingga tergelincir masuk waktu Dzuhur (kecuali hari Jum'at bagi yang hadir di masjid).",
+      dalil: "HR. Muslim no. 832: 'Saat orang berdiri di tengah hari hingga matahari tergelincir.'",
+    };
+  }
+
+  // 3. Waktu Menjelang Terbenam Matahari (Sebelum Maghrib)
+  // ~15 menit sebelum adzan Maghrib
+  const ghurubStart = new Date(maghrib.getTime() - 15 * 60000);
+  if (nowMs >= ghurubStart.getTime() && nowMs < maghrib.getTime()) {
+    return {
+      isTahrim: true,
+      type: "ghurub",
+      title: "Waktu Terlarang: Menjelang Matahari Terbenam",
+      timeRange: `${formatTime(ghurubStart)} - ${formatTime(maghrib)}`,
+      description: "Dilarang sholat sunnah saat matahari menguning dan hendak terbenam hingga tenggelam sempurna.",
+      dalil: "HR. Muslim no. 832: 'Saat matahari condong hendak terbenam hingga ia benar-benar tenggelam.'",
+    };
+  }
+
+  return {
+    isTahrim: false,
+    type: "none",
+    title: "Waktu Diperbolehkan Sholat",
+    timeRange: "",
+    description: "",
+    dalil: "",
+  };
+}
+

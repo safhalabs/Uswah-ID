@@ -19,6 +19,19 @@ class SoundEngine {
     return this.audioCtx;
   }
 
+  public isAudioUnlocked(): boolean {
+    return !!this.audioCtx && this.audioCtx.state === "running";
+  }
+
+  public async unlockAudio(): Promise<boolean> {
+    const ctx = this.getAudioContext();
+    if (!ctx) return false;
+    if (ctx.state === "suspended") {
+      await ctx.resume();
+    }
+    return ctx.state === "running";
+  }
+
   /**
    * Mainkan nada lonceng/chime Islami lembut saat masuk waktu sholat
    */

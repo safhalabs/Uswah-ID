@@ -21,8 +21,10 @@ import { CityLocation } from "@/data/cities";
 import {
   calculateDhuhaSchedule,
   calculateTahajudSchedule,
+  calculateWaktuTahrim,
   DhuhaScheduleInfo,
   TahajudScheduleInfo,
+  WaktuTahrimInfo,
 } from "@/lib/sunnahCalculations";
 import { calculatePrayerTimes, DayPrayerSchedule } from "@/lib/prayerCalculations";
 import { getDayAmalan, toggleDayAmalan } from "@/lib/storage";
@@ -39,6 +41,7 @@ export default function TahajudDhuhaCard({
 }: TahajudDhuhaCardProps) {
   const [dhuha, setDhuha] = useState<DhuhaScheduleInfo | null>(null);
   const [tahajud, setTahajud] = useState<TahajudScheduleInfo | null>(null);
+  const [waktuTahrim, setWaktuTahrim] = useState<WaktuTahrimInfo | null>(null);
   const [activeTabMobile, setActiveTabMobile] = useState<"dhuha" | "tahajud">("dhuha");
   const [hasPrayedDhuha, setHasPrayedDhuha] = useState(false);
   const [hasPrayedTahajud, setHasPrayedTahajud] = useState(false);
@@ -52,6 +55,7 @@ export default function TahajudDhuhaCard({
       const sched = calculatePrayerTimes(city, now);
       setDhuha(calculateDhuhaSchedule(city, now, sched));
       setTahajud(calculateTahajudSchedule(city, now, sched));
+      setWaktuTahrim(calculateWaktuTahrim(city, now, sched));
       setCurrentTimeStr(
         now.toLocaleTimeString("id-ID", {
           hour: "2-digit",
@@ -214,6 +218,19 @@ export default function TahajudDhuhaCard({
               )}
             </div>
           </div>
+
+          {/* Fiqih Notice: Waktu Tahrim (Terbit Matahari / Istiwa') */}
+          {waktuTahrim?.isTahrim && (waktuTahrim.type === "syuruq" || waktuTahrim.type === "istiwa") && (
+            <div className="relative z-10 mb-4 p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-900 dark:text-rose-200 text-xs flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold">Perhatian Fiqih: {waktuTahrim.title} ({waktuTahrim.timeRange})</span>
+                <p className="text-[11px] text-rose-800 dark:text-rose-300 mt-0.5 leading-snug">
+                  {waktuTahrim.description} (<em>{waktuTahrim.dalil}</em>)
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* URGENT WARNING BANNER (Jika belum sholat dan waktu tinggal sedikit!) */}
           {dhuha.isUrgent && !hasPrayedDhuha && (

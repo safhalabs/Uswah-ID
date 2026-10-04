@@ -18,6 +18,10 @@ import {
   CalendarDays,
   BellRing,
   CheckCircle2,
+  Maximize2,
+  Compass,
+  BookOpen,
+  AlertTriangle,
 } from "lucide-react";
 import { CityLocation } from "@/data/cities";
 import {
@@ -28,6 +32,10 @@ import {
 import { soundEngine } from "@/lib/audioAlert";
 import { getStoredPreferences, saveStoredPreferences } from "@/lib/storage";
 import { getHijriDate } from "@/lib/hijriConverter";
+import { calculateWaktuTahrim, WaktuTahrimInfo } from "@/lib/sunnahCalculations";
+import KioskDisplayModal from "@/components/kiosk/KioskDisplayModal";
+import QiblaCompassModal from "@/components/qibla/QiblaCompassModal";
+import DzikirModal from "@/components/dzikir/DzikirModal";
 
 interface PrayerTimesCardProps {
   city: CityLocation;
@@ -46,6 +54,15 @@ export default function PrayerTimesCard({
   const [hasNotificationPerm, setHasNotificationPerm] = useState(false);
   const [isPlayingSound, setIsPlayingSound] = useState(false);
   const [preAdzanAlertEnabled, setPreAdzanAlertEnabled] = useState(true);
+  const [audioVolume, setAudioVolume] = useState<number>(0.8);
+  const [audioUnlocked, setAudioUnlocked] = useState<boolean>(true);
+  const [waktuTahrim, setWaktuTahrim] = useState<WaktuTahrimInfo | null>(null);
+
+  // Modals state
+  const [isKioskOpen, setIsKioskOpen] = useState(false);
+  const [isQiblaOpen, setIsQiblaOpen] = useState(false);
+  const [isDzikirOpen, setIsDzikirOpen] = useState(false);
+
   const [, startTransition] = useTransition();
 
   const lastNotified10mRef = useRef<string>("");
@@ -58,6 +75,8 @@ export default function PrayerTimesCard({
 
     const initialPrefs = getStoredPreferences();
     setPreAdzanAlertEnabled(initialPrefs.preAdzanReminderEnabled);
+    setAudioVolume(initialPrefs.audioVolume);
+    setAudioUnlocked(soundEngine.isAudioUnlocked());
 
     const updateTimes = () => {
       const now = new Date();
@@ -75,6 +94,10 @@ export default function PrayerTimesCard({
         const prefs = getStoredPreferences();
         const hijri = getHijriDate(now, prefs.hijriAdjustment);
         setHijriTodayStr(hijri.formatted);
+
+        // Check 3 Waktu Terlarang Sholat (Waktu Tahrim)
+        const tahrim = calculateWaktuTahrim(city, now, sched);
+        setWaktuTahrim(tahrim);
 
         // Check for automatic notification triggers
         if (sched && sched.nextPrayer) {
@@ -118,8 +141,50 @@ export default function PrayerTimesCard({
 
     updateTimes();
     const interval = setInterval(updateTimes, 1000);
-    return () => clearInterval(interval);
-  }, [city]);
+
+    // Global Keyboard Shortcuts (F = Kiosk, Q = Qibla, D = Dzikir, K = Kota, M = Mute)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName)) {
+        return;
+      }
+      if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
+        setIsKioskOpen((prev) => !prev);
+      } else if (e.key === "q" || e.key === "Q") {
+        e.preventDefault();
+        setIsQiblaOpen((prev) => !prev);
+      } else if (e.key === "d" || e.key === "D") {
+        e.preventDefault();
+        setIsDzikirOpen((prev) => !prev);
+      } else if (e.key === "k" || e.key === "K") {
+        e.preventDefault();
+        onOpenCitySelector();
+      } else if (e.key === "m" || e.key === "M") {
+        e.preventDefault();
+        const prefs = getStoredPreferences();
+        const nextVal = !prefs.audioEnabled;
+        saveStoredPreferences({ audioEnabled: nextVal });
+        if (nextVal) soundEngine.playGentleChime(0.4);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [city, onOpenCitySelector]);
+
+  const handleVolumeChange = (newVol: number) => {
+    setAudioVolume(newVol);
+    saveStoredPreferences({ audioVolume: newVol });
+  };
+
+  const handleUnlockAudio = async () => {
+    await soundEngine.unlockAudio();
+    soundEngine.playGentleChime(audioVolume * 0.5);
+    setAudioUnlocked(true);
+  };
 
   if (!schedule) {
     return (
@@ -317,6 +382,96 @@ export default function PrayerTimesCard({
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Floating Audio Autoplay Unlock Safeguard */}
+      {!audioUnlocked && (
+        <div
+          onClick={handleUnlockAudio}
+          className="relative z-20 mb-4 p-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shadow-lg flex items-center justify-between gap-3 cursor-pointer transition-all animate-bounce"
+        >
+          <div className="flex items-center gap-2">
+            <Volume2 className="w-4 h-4 text-slate-950 flex-shrink-0" />
+            <span>Klik di sini sekali untuk memastikan alarm adzan &amp; audio browser aktif di latar belakang</span>
+          </div>
+          <span className="px-2.5 py-1 rounded-xl bg-slate-950 text-amber-300 text-[10px] font-mono uppercase font-bold flex-shrink-0">
+            Aktifkan Suara
+          </span>
+        </div>
+      )}
+
+      {/* Educational Waktu Tahrim (Terlarang Sholat) Alert */}
+      {waktuTahrim?.isTahrim && (
+        <div className="relative z-10 mb-4 p-3.5 rounded-2xl bg-rose-950/40 border border-rose-400/50 text-rose-100 backdrop-blur-md text-xs flex items-start gap-2.5 shadow-md">
+          <AlertTriangle className="w-4 h-4 text-rose-300 flex-shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-bold text-rose-200">
+                ⚠️ {waktuTahrim.title} ({waktuTahrim.timeRange})
+              </span>
+              <span className="px-2 py-0.2 rounded-md bg-rose-500/30 text-[10px] font-mono font-bold text-rose-200 border border-rose-400/30">
+                Fiqih Sholat
+              </span>
+            </div>
+            <p className="text-[11px] text-rose-200/90 leading-relaxed">
+              {waktuTahrim.description} (<em>{waktuTahrim.dalil}</em>)
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Utility Toolbar: Kiosk Display, Qibla Compass, Dzikir Ba'da Sholat, Volume */}
+      <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5 mb-5 p-2 rounded-2xl bg-black/30 border border-white/10 text-xs backdrop-blur-md">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <button
+            onClick={() => setIsKioskOpen(true)}
+            type="button"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-emerald-200 border border-white/10 font-bold transition-all cursor-pointer hover:border-emerald-400/40 hover:text-white"
+            title="Buka Mode Layar Penuh Kiosk untuk Monitor Kantor / Monitor Miring (Pintasan: Tekan F)"
+          >
+            <Maximize2 className="w-3.5 h-3.5 text-amber-300" />
+            <span>Mode Kiosk (F)</span>
+          </button>
+
+          <button
+            onClick={() => setIsQiblaOpen(true)}
+            type="button"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-emerald-200 border border-white/10 font-bold transition-all cursor-pointer hover:border-emerald-400/40 hover:text-white"
+            title="Buka Kompas Arah Kiblat Presisi (Pintasan: Tekan Q)"
+          >
+            <Compass className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Arah Kiblat (Q)</span>
+          </button>
+
+          <button
+            onClick={() => setIsDzikirOpen(true)}
+            type="button"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-emerald-200 border border-white/10 font-bold transition-all cursor-pointer hover:border-emerald-400/40 hover:text-white"
+            title="Buka Dzikir Ba'da Sholat & Tasbih Digital (Pintasan: Tekan D)"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-amber-300" />
+            <span>Dzikir &amp; Tasbih (D)</span>
+          </button>
+        </div>
+
+        {/* Quick Volume Slider */}
+        <div className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-[11px]">
+          <Volume2 className="w-3.5 h-3.5 text-amber-300" />
+          <span className="text-emerald-200/80 font-medium">Vol:</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value={audioVolume}
+            onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+            className="w-16 sm:w-20 accent-amber-400 cursor-pointer h-1.5 rounded-lg bg-white/20"
+            title={`Volume Suara: ${Math.round(audioVolume * 100)}%`}
+          />
+          <span className="font-mono text-[10px] text-amber-300 min-w-[28px]">
+            {Math.round(audioVolume * 100)}%
+          </span>
         </div>
       </div>
 
@@ -658,6 +813,25 @@ export default function PrayerTimesCard({
           );
         })}
       </div>
+
+      {/* Interactive Modals */}
+      <KioskDisplayModal
+        isOpen={isKioskOpen}
+        onClose={() => setIsKioskOpen(false)}
+        city={city}
+        isPortraitMode={isPortraitMode}
+      />
+
+      <QiblaCompassModal
+        isOpen={isQiblaOpen}
+        onClose={() => setIsQiblaOpen(false)}
+        city={city}
+      />
+
+      <DzikirModal
+        isOpen={isDzikirOpen}
+        onClose={() => setIsDzikirOpen(false)}
+      />
     </div>
   );
 }
